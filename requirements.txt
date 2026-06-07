@@ -1,5 +1,5 @@
-playwright
-pytest
-pytest-playwright
-python-dotenv
-ruff
+playwright==1.60.0
+pytest==9.0.3
+pytest-playwright==0.8.0
+python-dotenv==1.2.2
+ruff==0.15.16

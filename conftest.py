@@ -4,6 +4,8 @@ import pytest
 from playwright.sync_api import Browser, Page, Playwright
 
 from core.config import Settings, get_settings
+from pages.dashboard_page import DashboardPage
+from pages.statistics_page import StatisticsPage
 from services.auth_service import AuthService
 
 
@@ -32,3 +34,23 @@ def authenticated_page(
     yield page
 
     context.close()
+
+
+@pytest.fixture()
+def anonymous_page(browser: Browser) -> Generator[Page, None, None]:
+    context = browser.new_context()
+    page = context.new_page()
+
+    yield page
+
+    context.close()
+
+
+@pytest.fixture()
+def dashboard_page(authenticated_page: Page, settings: Settings) -> DashboardPage:
+    return DashboardPage(page=authenticated_page, base_url=settings.base_url)
+
+
+@pytest.fixture()
+def statistics_page(authenticated_page: Page, settings: Settings) -> StatisticsPage:
+    return StatisticsPage(page=authenticated_page, base_url=settings.base_url)

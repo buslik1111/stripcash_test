@@ -1,0 +1,14 @@
+from playwright.sync_api import Page, expect
+
+
+class BasePage:
+    """Базовая страница с общей логикой открытия URL для page object классов."""
+
+    def __init__(self, page: Page, base_url: str) -> None:
+        self._page = page
+        self._base_url = base_url
+
+    def open_path(self, path: str) -> None:
+        url = f"{self._base_url}{path}"
+        self._page.goto(url)
+        expect(self._page).to_have_url(url)

@@ -13,14 +13,13 @@ class StatisticsTestIds:
     """Хранит data-testid элементов страницы Statistics."""
 
     TABLE = "Table"
+    TABLE_CELL = "TableCell"
 
 
 class StatisticsTableText:
     """Хранит текстовые маркеры, которые используются при чтении отчета."""
 
     NO_DATA = "No suitable data"
-    CLICKS_HEADER = "CLICKS"
-    GROUP_HEADER = "GROUP"
 
 
 class StatisticsPage(BasePage):
@@ -48,25 +47,24 @@ class StatisticsPage(BasePage):
         table = self._page.get_by_test_id(StatisticsTestIds.TABLE)
         expect(table).to_be_visible()
 
-        table_text = table.inner_text()
-        if StatisticsTableText.NO_DATA in table_text:
+        if StatisticsTableText.NO_DATA in table.inner_text():
             return 0
 
-        rows = [row.strip() for row in table_text.splitlines() if row.strip()]
+        clicks_values = []
+        cells = table.get_by_test_id(StatisticsTestIds.TABLE_CELL)
 
-        try:
-            clicks_index = rows.index(StatisticsTableText.CLICKS_HEADER)
-            group_index = rows.index(StatisticsTableText.GROUP_HEADER)
-        except ValueError as error:
-            raise RuntimeError(f"Report table has unexpected structure: {rows}") from error
+        for index in range(cells.count()):
+            cell_text = cells.nth(index).inner_text().strip()
 
-        clicks_values = [
-            int(row)
-            for row in rows[clicks_index + 1 : group_index]
-            if row.isdigit()
-        ]
+            if not cell_text:
+                continue
+
+            if not cell_text.isdigit():
+                break
+
+            clicks_values.append(int(cell_text))
 
         if not clicks_values:
-            raise RuntimeError(f"Clicks values were not found in report table: {rows}")
+            raise RuntimeError("Clicks values were not found in report table")
 
         return clicks_values[-1]

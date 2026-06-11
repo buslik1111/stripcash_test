@@ -4,13 +4,13 @@ from pages.base_page import BasePage
 
 
 class DashboardTestIds:
-    """Хранит data-testid элементов страницы Dashboard."""
+    """Хранит data-testid элементов страницы Dashboard"""
 
     DEFAULT_LINK = "LinkUrl"
 
 
 class DashboardPage(BasePage):
-    """Описывает действия пользователя на странице Dashboard."""
+    """Описывает действия пользователя на странице Dashboard"""
 
     def __init__(self, page: Page, base_url: str) -> None:
         super().__init__(page=page, base_url=base_url)

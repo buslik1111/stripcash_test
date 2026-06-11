@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 @dataclass(frozen=True)
 class Settings:
-    """Хранит настройки запуска тестов, загруженные из переменных окружения."""
+    """Хранит настройки запуска тестов, загруженные из переменных окружения"""
 
     login: str
     password: str

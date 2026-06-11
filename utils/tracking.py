@@ -3,7 +3,7 @@ from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
 
 def build_unique_tracking_link(link: str) -> str:
-    """Добавляет уникальный sourceId, чтобы tracking-система не склеила клик."""
+    """Добавляет уникальный sourceId, чтобы tracking-система не склеила клик"""
 
     parsed_url = urlparse(link)
     query_params = dict(parse_qsl(parsed_url.query))

@@ -14,7 +14,6 @@ class Settings:
     api_base_url: str
     statistics_timeout_seconds: int
     statistics_poll_interval_ms: int
-    tracking_retry_interval_seconds: int
 
 
 def get_settings() -> Settings:
@@ -32,10 +31,6 @@ def get_settings() -> Settings:
         statistics_poll_interval_ms=_get_int_env(
             name="STATISTICS_POLL_INTERVAL_MS",
             default=5_000,
-        ),
-        tracking_retry_interval_seconds=_get_int_env(
-            name="TRACKING_RETRY_INTERVAL_SECONDS",
-            default=15,
         ),
     )
 

@@ -45,7 +45,6 @@ STRIPCASH_BASE_URL=https://stripcash.com
 STRIPCASH_API_BASE_URL=https://api.stripcash.com
 STATISTICS_TIMEOUT_SECONDS=60
 STATISTICS_POLL_INTERVAL_MS=5000
-TRACKING_RETRY_INTERVAL_SECONDS=15
 ```
 
 ## Локальный запуск
@@ -96,13 +95,3 @@ docker run --rm --env-file .env stripcash-tests
 - Авторизация выполняется через API, чтобы не зависеть от reCAPTCHA на UI login.
 - Перед переходом к `Default link` в ссылку добавляется уникальный `sourceId`, чтобы tracking-система не склеила повторные клики.
 - Статистика обновляется не мгновенно, поэтому тест повторно запускает отчет до появления нового клика или до истечения таймаута.
-
-## Troubleshooting
-
-Если тест падает с сообщением, что количество кликов не увеличилось, сначала проверьте доступность tracking-домена из текущей сети:
-
-```bash
-curl -I -L "https://go.mavrtracktor.com"
-```
-
-При ошибках уровня `SSL_ERROR_SYSCALL`, `ERR_CONNECTION_CLOSED` или `chrome-error://chromewebdata/` переход по `Default link` не доходит до tracking-системы, поэтому новый клик не появляется в отчете.

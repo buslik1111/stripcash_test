@@ -2,14 +2,14 @@ from playwright.sync_api import Playwright, StorageState
 
 
 class AuthService:
-    """Авторизует пользователя через API и возвращает storage state для UI-теста"""
+    """Authenticate through the API and return UI storage state."""
 
     def __init__(self, playwright: Playwright, api_base_url: str) -> None:
         self._playwright = playwright
         self._api_base_url = api_base_url
 
     def login(self, username: str, password: str) -> StorageState:
-        """Выполняет API-логин и подготавливает storage state для браузерной сессии"""
+        """Log in through the API and prepare browser storage state."""
 
         request_context = self._playwright.request.new_context(
             base_url=self._api_base_url,
@@ -19,22 +19,21 @@ class AuthService:
             },
         )
 
-        response = request_context.post(
-            "/front/v1/auth/login",
-            data={
-                "usernameOrEmail": username,
-                "password": password,
-                "recaptchaToken": "",
-            },
-        )
-
-        if not response.ok:
-            request_context.dispose()
-            raise RuntimeError(
-                f"Login failed with status {response.status}: {response.text()}"
+        try:
+            response = request_context.post(
+                "/front/v1/auth/login",
+                data={
+                    "usernameOrEmail": username,
+                    "password": password,
+                    "recaptchaToken": "",
+                },
             )
 
-        storage_state = request_context.storage_state()
-        request_context.dispose()
+            if not response.ok:
+                raise RuntimeError(
+                    f"Login failed with status {response.status}: {response.text()}"
+                )
 
-        return storage_state
+            return request_context.storage_state()
+        finally:
+            request_context.dispose()

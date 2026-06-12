@@ -4,7 +4,7 @@ from core.config import Settings
 from pages.dashboard_page import DashboardPage
 from pages.statistics_page import StatisticsPage
 from utils.tracking import build_unique_tracking_link
-from validations.assert_wrappers import assert_greater_or_equal
+from validations.assert_wrappers import assert_greater
 
 
 def test_default_link_click_is_reflected_in_statistics(
@@ -14,23 +14,24 @@ def test_default_link_click_is_reflected_in_statistics(
     statistics_page: StatisticsPage,
     settings: Settings,
 ) -> None:
+    dashboard_page.open()
+    tracking_link = build_unique_tracking_link(dashboard_page.get_default_link())
+
     statistics_page.open()
     statistics_page.run_report()
     clicks_before = statistics_page.get_total_clicks()
 
-    dashboard_page.open()
-    tracking_link = build_unique_tracking_link(dashboard_page.get_default_link())
     anonymous_page.goto(tracking_link, wait_until="domcontentloaded")
 
     clicks_after = statistics_page.wait_for_total_clicks_increment(
-        expected_clicks=clicks_before + 1,
+        clicks_before=clicks_before,
         timeout_seconds=settings.statistics_timeout_seconds,
         interval_ms=settings.statistics_poll_interval_ms,
     )
 
-    assert_greater_or_equal(
+    assert_greater(
         actual_value=clicks_after,
-        expected_value=clicks_before + 1,
+        expected_value=clicks_before,
         error_msg=(
             "Click count was not increased after opening default link: "
             f"before={clicks_before}, after={clicks_after}"

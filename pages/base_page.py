@@ -2,7 +2,7 @@ from playwright.sync_api import Page, expect
 
 
 class BasePage:
-    """Базовая страница с общей логикой открытия URL для page object классов"""
+    """Provide common URL navigation for page objects."""
 
     def __init__(self, page: Page, base_url: str) -> None:
         self._page = page

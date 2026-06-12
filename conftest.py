@@ -29,21 +29,21 @@ def authenticated_page(
     )
 
     context = browser.new_context(storage_state=storage_state)
-    page = context.new_page()
-
-    yield page
-
-    context.close()
+    try:
+        page = context.new_page()
+        yield page
+    finally:
+        context.close()
 
 
 @pytest.fixture()
 def anonymous_page(browser: Browser) -> Generator[Page, None, None]:
     context = browser.new_context()
-    page = context.new_page()
-
-    yield page
-
-    context.close()
+    try:
+        page = context.new_page()
+        yield page
+    finally:
+        context.close()
 
 
 @pytest.fixture()

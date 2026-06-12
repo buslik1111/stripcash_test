@@ -6,26 +6,29 @@ from pages.base_page import BasePage
 
 
 class StatisticsButtons:
-    """Хранит названия кнопок страницы Statistics"""
+    """Store button names used on the Statistics page."""
 
     RUN_REPORT_BUTTON = "Run report"
 
 
 class StatisticsTestIds:
-    """Хранит data-testid элементов страницы Statistics"""
+    """Store data-testid values used on the Statistics page."""
 
     TABLE = "Table"
+    TABLE_HEAD = "TableHead"
     TABLE_CELL = "TableCell"
 
 
 class StatisticsTableText:
-    """Хранит текстовые маркеры, которые используются при чтении отчета"""
+    """Store text markers used to read the statistics report."""
 
+    CLICKS = "Clicks"
     NO_DATA = "No suitable data"
+    TOTAL = "Total"
 
 
 class StatisticsPage(BasePage):
-    """Описывает действия пользователя и чтение данных на странице Statistics"""
+    """Provide actions and report data access for the Statistics page."""
 
     def __init__(self, page: Page, base_url: str) -> None:
         super().__init__(page=page, base_url=base_url)
@@ -44,7 +47,7 @@ class StatisticsPage(BasePage):
         expect(table).to_be_visible(timeout=30_000)
 
     def get_total_clicks(self) -> int:
-        """Возвращает Total по колонке Clicks из виртуальной таблицы отчета"""
+        """Return the Total value from the Clicks column."""
 
         table = self._page.get_by_test_id(StatisticsTestIds.TABLE)
         expect(table).to_be_visible()
@@ -52,42 +55,53 @@ class StatisticsPage(BasePage):
         if StatisticsTableText.NO_DATA in table.inner_text():
             return 0
 
-        clicks_values = []
-        cells = table.get_by_test_id(StatisticsTestIds.TABLE_CELL)
+        clicks_header = table.get_by_test_id(StatisticsTestIds.TABLE_HEAD).filter(
+            has_text=StatisticsTableText.CLICKS
+        )
+        total_cell = table.get_by_test_id(StatisticsTestIds.TABLE_CELL).filter(
+            has_text=StatisticsTableText.TOTAL
+        )
+        expect(clicks_header).to_have_count(1)
+        expect(total_cell).to_have_count(1)
 
-        for index in range(cells.count()):
-            cell_text = cells.nth(index).inner_text().strip()
+        column_index = clicks_header.get_attribute("data-column-index")
+        row_index = total_cell.get_attribute("data-row-index")
 
-            if not cell_text:
-                continue
+        if column_index is None or row_index is None:
+            raise RuntimeError("Statistics table indexes were not found")
 
-            if not cell_text.isdigit():
-                break
+        clicks_total_cell = table.locator(
+            f'[data-testid="{StatisticsTestIds.TABLE_CELL}"]'
+            f'[data-column-index="{column_index}"]'
+            f'[data-row-index="{row_index}"]'
+        )
+        expect(clicks_total_cell).to_have_count(1)
 
-            clicks_values.append(int(cell_text))
+        clicks_value = (
+            clicks_total_cell.inner_text().strip().replace(",", "").replace(" ", "")
+        )
 
-        if not clicks_values:
-            raise RuntimeError("Clicks values were not found in report table")
+        if not clicks_value.isdigit():
+            raise RuntimeError(f"Unexpected Clicks total value: {clicks_value}")
 
-        return clicks_values[-1]
+        return int(clicks_value)
 
     def wait_for_total_clicks_increment(
         self,
-        expected_clicks: int,
+        clicks_before: int,
         timeout_seconds: int,
         interval_ms: int,
     ) -> int:
-        """Перезапускает отчет, пока статистика не увидит новый клик"""
+        """Rerun the report until the total Clicks value increases."""
 
         deadline = monotonic() + timeout_seconds
-        actual_clicks = expected_clicks - 1
+        actual_clicks = clicks_before
 
         while monotonic() < deadline:
-            self.open()
             self.run_report()
             actual_clicks = self.get_total_clicks()
 
-            if actual_clicks >= expected_clicks:
+            if actual_clicks > clicks_before:
                 return actual_clicks
 
             self._page.wait_for_timeout(interval_ms)

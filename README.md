@@ -1,20 +1,21 @@
 # Stripcash default link test
 
-## Описание
+## Overview
 
-Проект содержит автотест для проверки сценария из тестового задания:
+This project contains an automated test for the following scenario:
 
-1. Авторизоваться в `https://stripcash.com` через API.
-2. Открыть `/overview/dashboard`.
-3. Получить текущий `Default link`.
-4. Перейти по tracking-ссылке в отдельной анонимной браузерной сессии.
-5. Открыть `/analytics/statistics`.
-6. Нажать `Run report`.
-7. Проверить, что значение в колонке `Clicks` увеличилось минимум на 1.
+1. Authenticate at `https://stripcash.com` through the API.
+2. Open `/overview/dashboard`.
+3. Get the current `Default link`.
+4. Open the tracking link in a separate anonymous browser context.
+5. Open `/analytics/statistics`.
+6. Click `Run report`.
+7. Verify that the value in the `Clicks` column has increased by at least 1.
 
-Логин и пароль не хранятся в коде. Тест читает их из переменных окружения.
+The login and password are not stored in the source code. The test reads them
+from environment variables.
 
-## Стек
+## Technology stack
 
 - Python
 - Pytest
@@ -23,20 +24,20 @@
 - python-dotenv
 - Ruff
 
-## Структура
+## Project structure
 
 ```text
-core/          настройки проекта
-pages/         Page Object классы
-services/      сервисы для подготовки тестового состояния
-tests/         тестовые сценарии
-utils/         вспомогательные функции
+core/          project configuration
+pages/         Page Object classes
+services/      test state preparation services
+tests/         test scenarios
+utils/         utility functions
 validations/   assertion helpers
 ```
 
-## Настройка окружения
+## Environment setup
 
-Создайте файл `.env` по примеру `.env.example`:
+Create a `.env` file based on `.env.example`:
 
 ```text
 STRIPCASH_LOGIN=your_login_here
@@ -47,9 +48,9 @@ STATISTICS_TIMEOUT_SECONDS=60
 STATISTICS_POLL_INTERVAL_MS=5000
 ```
 
-## Локальный запуск
+## Local execution
 
-Установите зависимости:
+Install the dependencies:
 
 ```bash
 python3 -m venv .venv
@@ -58,19 +59,19 @@ python3 -m pip install -r requirements.txt
 python3 -m playwright install chromium
 ```
 
-Запустите тест:
+Run the test:
 
 ```bash
 python3 -m pytest
 ```
 
-Запуск в видимом браузере:
+Run the test in headed mode:
 
 ```bash
 python3 -m pytest --headed --slowmo 500
 ```
 
-Проверка стиля:
+Run the linter:
 
 ```bash
 python3 -m ruff check .
@@ -78,20 +79,23 @@ python3 -m ruff check .
 
 ## Docker
 
-Соберите image:
+Build the image:
 
 ```bash
 docker build -t stripcash-tests .
 ```
 
-Запустите тесты:
+Run the test:
 
 ```bash
 docker run --rm --env-file .env stripcash-tests
 ```
 
-## Особенности теста
+## Implementation details
 
-- Авторизация выполняется через API, чтобы не зависеть от reCAPTCHA на UI login.
-- Перед переходом к `Default link` в ссылку добавляется уникальный `sourceId`, чтобы tracking-система не склеила повторные клики.
-- Статистика обновляется не мгновенно, поэтому тест повторно запускает отчет до появления нового клика или до истечения таймаута.
+- Authentication is performed through the API to avoid depending on reCAPTCHA
+  on the UI login page.
+- A unique `sourceId` is added to the `Default link` before navigation to
+  prevent the tracking system from deduplicating repeated clicks.
+- Statistics are updated asynchronously, so the test reruns the report until
+  the new click appears or the timeout expires.

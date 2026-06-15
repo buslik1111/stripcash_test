@@ -9,6 +9,12 @@ class DashboardTestIds:
     DEFAULT_LINK = "LinkUrl"
 
 
+class DashboardSelectors:
+    """Store CSS selectors used on the Dashboard page."""
+
+    DEFAULT_LINK_CONTAINER = "#qa-default-link"
+
+
 class DashboardPage(BasePage):
     """Provide user actions for the Dashboard page."""
 
@@ -19,7 +25,9 @@ class DashboardPage(BasePage):
         self.open_path("/overview/dashboard")
 
     def get_default_link(self) -> str:
-        default_link = self._page.get_by_test_id(DashboardTestIds.DEFAULT_LINK)
+        default_link = self._page.locator(
+            DashboardSelectors.DEFAULT_LINK_CONTAINER
+        ).get_by_test_id(DashboardTestIds.DEFAULT_LINK)
         expect(default_link).to_be_visible()
 
         link = default_link.inner_text().strip()

@@ -9,8 +9,8 @@ This project contains an automated test for the following scenario:
 3. Get the current `Default link`.
 4. Open the tracking link in a separate anonymous browser context.
 5. Open `/analytics/statistics`.
-6. Click `Run report`.
-7. Verify that the value in the `Clicks` column has increased by at least 1.
+6. Filter the report by the generated source.
+7. Click `Run report` and verify that the report contains exactly one click.
 
 The login and password are not stored in the source code. The test reads them
 from environment variables.
@@ -95,7 +95,7 @@ docker run --rm --env-file .env stripcash-tests
 
 - Authentication is performed through the API to avoid depending on reCAPTCHA
   on the UI login page.
-- A unique `sourceId` is added to the `Default link` before navigation to
-  prevent the tracking system from deduplicating repeated clicks.
+- A unique `sourceId` is added to the `Default link` and used as a report
+  filter. This isolates the click created by each test during parallel runs.
 - Statistics are updated asynchronously, so the test reruns the report until
   the new click appears or the timeout expires.

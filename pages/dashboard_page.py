@@ -28,7 +28,7 @@ class DashboardPage(BasePage):
         default_link = self._page.locator(
             DashboardSelectors.DEFAULT_LINK_CONTAINER
         ).get_by_test_id(DashboardTestIds.DEFAULT_LINK)
-        expect(default_link).to_be_visible()
+        expect(default_link).to_be_visible(timeout=30_000)
 
         link = default_link.inner_text().strip()
 

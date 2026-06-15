@@ -19,7 +19,7 @@ def test_default_link_click_is_reflected_in_statistics(
         dashboard_page.get_default_link()
     )
 
-    anonymous_page.goto(tracking_link, wait_until="domcontentloaded")
+    anonymous_page.goto(tracking_link, wait_until="commit")
 
     statistics_page.open()
     statistics_page.filter_by_source(

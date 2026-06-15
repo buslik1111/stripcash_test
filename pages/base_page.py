@@ -10,5 +10,5 @@ class BasePage:
 
     def open_path(self, path: str) -> None:
         url = f"{self._base_url}{path}"
-        self._page.goto(url)
+        self._page.goto(url, wait_until="domcontentloaded")
         expect(self._page).to_have_url(url)
